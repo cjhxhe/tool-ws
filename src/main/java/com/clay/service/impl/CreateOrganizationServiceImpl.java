@@ -65,9 +65,12 @@ public class CreateOrganizationServiceImpl implements CreateOrganizationService{
 	
 	private final String CODS_DATA = "//*[name()='data']";
 	private final String CODS_SUCCESS = "//*[name()='createOrganizationResponse']/*[name()='Success']";
+	
+	private final String CODS_INTER_SUCCESS = "//*[name()='getDataIntegrationResponse']/*[name()='Success']";
 
 	@Override
-	public void createOrganization(String organizationName) {
+	public String createOrganization(String organizationName) {
+		String resultStatus = "Failed";
 		try {
 			Document seqRequestDoc = new SAXReader().read(Class.class.getResourceAsStream("/templates/getOrgInfoSequence.xml"));
 			Document response = soapClient.sendSOAPMessage(seqRequestDoc.asXML());
@@ -138,7 +141,10 @@ public class CreateOrganizationServiceImpl implements CreateOrganizationService{
 					Document stringDataDoc = DocumentHelper.parseText(stringData);
 					dataEle.add(stringDataDoc.getRootElement());
 					
-					soapClient.sendSOAPMessage(blisToBossSOPATemp.asXML());
+					Document blisToBossResp = soapClient.sendSOAPMessage(blisToBossSOPATemp.asXML());
+					if(blisToBossResp.selectSingleNode(CODS_INTER_SUCCESS) != null){
+						resultStatus = "Success";
+					}
 				}
 			}
 			
@@ -147,7 +153,7 @@ public class CreateOrganizationServiceImpl implements CreateOrganizationService{
 		}catch (SOAPClientException e) {
 			logger.error("send soap error:"+e.getMessage());
 		}
-		
+		return resultStatus;
 	}
 	
 	
