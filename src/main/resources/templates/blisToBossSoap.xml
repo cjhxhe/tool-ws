@@ -1,0 +1,9 @@
+<SOAP:Envelope xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP:Body>
+        <getDataIntegration xmlns="http://www.webex.com/blis/1.0/dataintegration/blis2boss">
+            <data>
+            	
+            </data>
+        </getDataIntegration>
+    </SOAP:Body>
+</SOAP:Envelope>
