@@ -8,19 +8,20 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.clay.App;
-import com.clay.service.CreateOrganizationService;
+import com.clay.enums.AccountType;
+import com.clay.service.AccountService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ContextConfiguration(classes = App.class)
-public class CreateOrganizationServiceImplTest {
+public class AccountServiceImplTest {
 
 	@Autowired
-	private CreateOrganizationService createOrganizationService;
+	private AccountService accountService;
 	
 	@Test
 	public void testCreateOrganization() {
-		String result = createOrganizationService.createOrganization("claytesttoolws001");
+		String result = accountService.createAccount("claytesttoolws001a01", "claytesttoolws001", AccountType.DIRECT);
 		assert "Success".equalsIgnoreCase(result);
 	}
 }
