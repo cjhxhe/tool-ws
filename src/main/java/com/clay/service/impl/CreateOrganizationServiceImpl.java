@@ -29,12 +29,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import com.clay.exception.SOAPClientException;
 import com.clay.service.CreateOrganizationService;
 import com.clay.soap.SOAPClient;
 
+import freemarker.core.ParseException;
+import freemarker.template.Configuration;
+import freemarker.template.MalformedTemplateNameException;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateNotFoundException;
+
 @Service
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public class CreateOrganizationServiceImpl implements CreateOrganizationService{
 	
 	private static Logger logger = LoggerFactory.getLogger(CreateOrganizationServiceImpl.class);
@@ -42,120 +51,91 @@ public class CreateOrganizationServiceImpl implements CreateOrganizationService{
 	@Autowired
 	private SOAPClient soapClient;
 	
-	private final String CODS_ORGNAME = "//*[name()='OrgName']";
-	private final String CODS_ORGID = "//*[name()='OrgID']";
-	private final String CODS_SYSDBDATE = "//*[name()='SysDBDate']";
-	private final String CODS_CUSTOMERID = "//*[name()='CustomerID']";
-	
-	private final String CODS_ORGADDRESS = "//*[name()='OrganizationForm']/*[name()='MainAddressID']";
-	private final String CODS_ADDRESS1 = "//*[name()='Addresses']/*[name()='BLIS_ADDRESS']/*[name()='ADDRESSID']";
-	private final String CODS_ADDRESS2 = "//*[name()='AddressTypes']/*[name()='BLIS_ADDRESSREFERENCE']/*[name()='ADDRESSID']";
-	
-	private final String CODS_INDIVIDUALADDRESS = "//*[name()='INDIVIDUALADDRESS']/*[name()='BLIS_ADDRESS']/*[name()='ADDRESSID']";
-	
-	private final String CODS_ADDRESSREFERENCEID = "//*[name()='AddressTypes']/*[name()='BLIS_ADDRESSREFERENCE']/*[name()='ADDRESSREFERENCEID']";
-	
-	private final String CODS_INDIVIDUALID1 = "//*[name()='BLIS_INDIVIDUAL']/*[name()='INDIVIDUALID']";
-	private final String CODS_INDIVIDUALID2 = "//*[name()='INDIVIDUALADDRESS']/*[name()='BLIS_ADDRESS']/*[name()='ENTITYKEYID']";
-	private final String CODS_INDIVIDUALID3 = "//*[name()='BLIS_CONTACT']/*[name()='INDIVIDUALID']";
-	
-	private final String CODS_CONTACTID = "//*[name()='BLIS_CONTACT']/*[name()='CONTACTID']";
-	
-	private final String CODS_AGENTASSIGNMENT = "//*[name()='SRAgentType']/*[name()='AgentAssignmentID']";
+	@Autowired
+	private Configuration freemarkerConfig;
 	
 	private final String CODS_DATA = "//*[name()='data']";
 	private final String CODS_SUCCESS = "//*[name()='createOrganizationResponse']/*[name()='Success']";
-	
 	private final String CODS_INTER_SUCCESS = "//*[name()='getDataIntegrationResponse']/*[name()='Success']";
 
 	@Override
 	public String createOrganization(String organizationName) {
 		String resultStatus = "Failed";
+		SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD");
 		try {
-			Document seqRequestDoc = new SAXReader().read(Class.class.getResourceAsStream("/templates/getOrgInfoSequence.xml"));
+			// Get needed Seq ids
+			Document seqRequestDoc = new SAXReader()
+					.read(Class.class.getResourceAsStream("/templates/getOrgInfoSequence.xml"));
 			Document response = soapClient.sendSOAPMessage(seqRequestDoc.asXML());
 			Map responseValues = paseSeqResponse(response);
-			
-			Document orgRequestDoc = new SAXReader().read(Class.class.getResourceAsStream("/templates/createOrganization.xml"));
-			Document orgRequestTemp = (Document) orgRequestDoc.clone();
-			
-			SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD");
-			
-			orgRequestTemp.selectSingleNode(CODS_ORGNAME).setText(organizationName);
-			orgRequestTemp.selectSingleNode(CODS_ORGID).setText((String)responseValues.get("ORGANIZATION"));
-			orgRequestTemp.selectSingleNode(CODS_SYSDBDATE).setText(sdf.format(new Date()));
-			
-			orgRequestTemp.selectSingleNode(CODS_CUSTOMERID).setText((String)responseValues.get("CUSTOMER"));
-			
+
+			// Create org request xml and send via soap
+			Map<String, String> dataMap = new HashMap<String, String>();
 			List addressIds = (List) responseValues.get("ADDRESS");
-			String orgAddressId = (String) addressIds.get(0);
-			orgRequestTemp.selectSingleNode(CODS_ORGADDRESS).setText(orgAddressId);
-			orgRequestTemp.selectSingleNode(CODS_ADDRESS1).setText(orgAddressId);
-			orgRequestTemp.selectSingleNode(CODS_ADDRESS2).setText(orgAddressId);
-			
-			List node_individualAddress = orgRequestTemp.selectNodes(CODS_INDIVIDUALADDRESS);
-			
-			for(int i=0;i<node_individualAddress.size()&&i+1<addressIds.size();i++){
-				((Node)node_individualAddress.get(i)).setText((String)addressIds.get(i+1));
-			}
-			
-			orgRequestTemp.selectSingleNode(CODS_ADDRESSREFERENCEID).setText((String) responseValues.get("ADDRESSREFERENCE"));
-			
 			List individualIds = (List) responseValues.get("INDIVIDUAL");
-			List node_individuals1 = orgRequestTemp.selectNodes(CODS_INDIVIDUALID1);
-			List node_individuals2 = orgRequestTemp.selectNodes(CODS_INDIVIDUALID2);
-			List node_individuals3 = orgRequestTemp.selectNodes(CODS_INDIVIDUALID3);
-			
-			for(int i=0;i<node_individuals1.size()&&i<individualIds.size();i++){
-				((Node)node_individuals1.get(i)).setText((String)individualIds.get(i));
-				((Node)node_individuals2.get(i)).setText((String)individualIds.get(i));
-				((Node)node_individuals3.get(i)).setText((String)individualIds.get(i));
-			}
-			
 			List contactIds = (List) responseValues.get("CONTACT");
-			List node_contactIds = orgRequestTemp.selectNodes(CODS_CONTACTID);
-			for(int i=0;i<node_contactIds.size()&&i<contactIds.size();i++){
-				((Node)node_contactIds.get(i)).setText((String)contactIds.get(i));
-			}
-			
 			List agentassignments = (List) responseValues.get("AGENTASSIGNMENT");
-			List node_agentassignments = orgRequestTemp.selectNodes(CODS_AGENTASSIGNMENT);
-			for(int i=0;i<node_agentassignments.size()&&i<agentassignments.size();i++){
-				((Node)node_agentassignments.get(i)).setText((String)agentassignments.get(i));
-			}
-			
-			logger.debug("requestXML:"+orgRequestTemp.asXML());
-			Document responseOrgXML = soapClient.sendSOAPMessage(orgRequestTemp.asXML());
-			
+			dataMap.put("organizationName", organizationName);
+			dataMap.put("orgId", String.valueOf(responseValues.get("ORGANIZATION")));
+			dataMap.put("sysDate", sdf.format(new Date()));
+			dataMap.put("customerId", String.valueOf(responseValues.get("CUSTOMER")));
+			dataMap.put("mainAddressId", String.valueOf(addressIds.get(0)));
+			dataMap.put("indAddressId1", String.valueOf(addressIds.get(1)));
+			dataMap.put("indAddressId2", String.valueOf(addressIds.get(2)));
+			dataMap.put("addressRefId", String.valueOf(responseValues.get("ADDRESSREFERENCE")));
+			dataMap.put("individualId1", String.valueOf(individualIds.get(0)));
+			dataMap.put("individualId2", String.valueOf(individualIds.get(1)));
+			dataMap.put("contactId1", String.valueOf(contactIds.get(0)));
+			dataMap.put("contactId2", String.valueOf(contactIds.get(1)));
+			dataMap.put("agentAssignId1", String.valueOf(agentassignments.get(0)));
+			dataMap.put("agentAssignId2", String.valueOf(agentassignments.get(1)));
+			dataMap.put("agentAssignId3", String.valueOf(agentassignments.get(2)));
+
+			Template template = freemarkerConfig.getTemplate("createOrganization.ftl", "UTF-8");
+			String orgCreateReqXML = FreeMarkerTemplateUtils.processTemplateIntoString(template, dataMap);
+			logger.debug("requestXML: " + orgCreateReqXML);
+			Document responseOrgXML = soapClient.sendSOAPMessage(orgCreateReqXML);
+
+			// process response
 			if (responseOrgXML != null) {
 				Node orgIdNode = responseOrgXML.selectSingleNode(CODS_SUCCESS);
 				if (orgIdNode != null) {
-					//orgBeanHelper.setCreateFlag(true);
 					/* send soap to the boss */
-					String stringData = this.transformCustomerForm(orgRequestTemp.asXML());
-					
-					Document blisToBossSOPA = new SAXReader().read(Class.class.getResourceAsStream("/templates/blisToBossSoap.xml"));
+					String stringData = this.transformCustomerForm(orgCreateReqXML);
+					Document blisToBossSOPA = new SAXReader()
+							.read(Class.class.getResourceAsStream("/templates/blisToBossSoap.xml"));
 					Document blisToBossSOPATemp = (Document) blisToBossSOPA.clone();
-					
 					Element dataEle = (Element) blisToBossSOPATemp.selectSingleNode(CODS_DATA);
 					Document stringDataDoc = DocumentHelper.parseText(stringData);
 					dataEle.add(stringDataDoc.getRootElement());
-					
 					Document blisToBossResp = soapClient.sendSOAPMessage(blisToBossSOPATemp.asXML());
-					if(blisToBossResp.selectSingleNode(CODS_INTER_SUCCESS) != null){
+					if (blisToBossResp.selectSingleNode(CODS_INTER_SUCCESS) != null) {
 						resultStatus = "Success";
 					}
 				}
 			}
-			
 		} catch (DocumentException e) {
 			logger.error("read soap template file failed!");
-		}catch (SOAPClientException e) {
-			logger.error("send soap error:"+e.getMessage());
+		} catch (SOAPClientException e) {
+			logger.error("send soap error:" + e.getMessage());
+		} catch (TemplateNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MalformedTemplateNameException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TemplateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return resultStatus;
 	}
-	
 	
 	private Map paseSeqResponse(Document response){
 		String[] entityNames = {"ORGANIZATION","CUSTOMER","ADDRESS","ADDRESSREFERENCE","INDIVIDUAL","CONTACT","AGENTASSIGNMENT" };
@@ -186,13 +166,10 @@ public class CreateOrganizationServiceImpl implements CreateOrganizationService{
 				}
 			}
 		}
-		
 		return values;
 	}
 	
-	
 	private String transformCustomerForm(String requestSOAP) {
-
 		StringWriter writer = new StringWriter();
 		StreamResult result = new StreamResult(writer);
 		String strCustomerNode = "";
@@ -200,26 +177,16 @@ public class CreateOrganizationServiceImpl implements CreateOrganizationService{
 		try {
 			Document doc = DocumentHelper.parseText(requestSOAP);
 			Node node = doc.selectSingleNode("//Organization");
-
 			Source source = new StreamSource(Class.class.getResourceAsStream("/blis2boss_customer.xsl"));
-
 			Transformer transformer = TransformerFactory.newInstance()
 					.newTransformer(source);
-
 			reader = new StringReader(node.asXML());
 			Source xmlSource = new StreamSource(reader);
-
 			transformer.transform(xmlSource, result);
-
 			strCustomerNode = writer.toString();
-			// strCustomerNode = strCustomerNode.replaceFirst("<?xml
-			// version=\"1.0\" encoding=\"UTF-8\"?>","");
-			// Brian change the replace method
 			int indexOrg = strCustomerNode.indexOf("<Organization>");
 			strCustomerNode = strCustomerNode.substring(indexOrg);
-			// End
 			logger.debug("after transform:" + strCustomerNode);
-
 		} catch (TransformerConfigurationException e) {
 			logger.error("transformCustomerForm  error:" + e.toString());
 			e.printStackTrace();
@@ -245,9 +212,7 @@ public class CreateOrganizationServiceImpl implements CreateOrganizationService{
 				e.printStackTrace();
 			}
 		}
-
 		return strCustomerNode;
-
 	}
 
 }

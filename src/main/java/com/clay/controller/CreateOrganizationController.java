@@ -1,25 +1,24 @@
 package com.clay.controller;
 
-import javax.annotation.Resource;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.clay.service.CreateOrganizationService;
 
 @Controller
+@RequestMapping("/organization")
 public class CreateOrganizationController {
-	
-	@Resource
+
+	@Autowired
 	private CreateOrganizationService createOrganizationService;
-	
-	@RequestMapping(path = "/createOrganization", method = { RequestMethod.GET, RequestMethod.POST })
+
+	@RequestMapping(path = "/create/{orgName}", method = { RequestMethod.GET, RequestMethod.POST })
 	@ResponseBody
-	public String createOrganization(@RequestParam("orgName") String orgName) {
+	public String createOrganization(@PathVariable("orgName") String orgName) {
 		return createOrganizationService.createOrganization(orgName);
 	}
 

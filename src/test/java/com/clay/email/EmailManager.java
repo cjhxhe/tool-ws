@@ -1,5 +1,8 @@
 package com.clay.email;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.mail.internet.MimeMessage;
 
 import org.junit.Test;
@@ -35,10 +38,12 @@ public class EmailManager {
 			public void prepare(MimeMessage mimeMessage) throws Exception {
 				MimeMessageHelper message = new MimeMessageHelper(mimeMessage, false, "UTF-8");
 				message.setFrom("PasswordManager@cisco.com", "PasswordManager@cisco.com");
-				message.setTo("jihan2@cisco.com");
+				message.setTo("clayyu@cisco.com");
 				message.setSubject("Password Notification: Your CEC Password has been changed");
 				Template template = configuration.getTemplate("email.ftl", "UTF-8");
-				String text = FreeMarkerTemplateUtils.processTemplateIntoString(template, null);
+				Map<String, String> dataMap = new HashMap<String, String>();
+				dataMap.put("name", "Clay");
+				String text = FreeMarkerTemplateUtils.processTemplateIntoString(template, dataMap);
 				message.setText(text);
 			}
 		});

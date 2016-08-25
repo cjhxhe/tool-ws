@@ -1,1 +1,1 @@
-Hello FreeMarker!
+Hello ${name}!
