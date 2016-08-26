@@ -21,7 +21,7 @@ public class AccountServiceImplTest {
 	
 	@Test
 	public void testCreateOrganization() {
-		String result = accountService.createAccount("claytesttoolws001a01", "claytesttoolws001", AccountType.DIRECT);
+		String result = accountService.createAccount("claytesttoolws001a02", "claytesttoolws001", AccountType.DIRECT);
 		assert "Success".equalsIgnoreCase(result);
 	}
 }

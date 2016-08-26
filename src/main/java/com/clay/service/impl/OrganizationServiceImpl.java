@@ -44,16 +44,16 @@ import freemarker.template.TemplateNotFoundException;
 
 @Service
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class OrganizationServiceImpl implements OrganizationService{
-	
+public class OrganizationServiceImpl implements OrganizationService {
+
 	private static Logger logger = LoggerFactory.getLogger(OrganizationServiceImpl.class);
-	
+
 	@Autowired
 	private SOAPClient soapClient;
-	
+
 	@Autowired
 	private Configuration freemarkerConfig;
-	
+
 	private final String CODS_DATA = "//*[name()='data']";
 	private final String CODS_SUCCESS = "//*[name()='createOrganizationResponse']/*[name()='Success']";
 	private final String CODS_INTER_SUCCESS = "//*[name()='getDataIntegrationResponse']/*[name()='Success']";
@@ -115,30 +115,29 @@ public class OrganizationServiceImpl implements OrganizationService{
 				}
 			}
 		} catch (DocumentException e) {
-			logger.error("read soap template file failed!");
+			logger.error("Create Organization DocumentException: " + e);
 		} catch (SOAPClientException e) {
-			logger.error("send soap error:" + e.getMessage());
+			logger.error("Create Organization SOAPClientException: " + e);
 		} catch (TemplateNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Create Organization TemplateNotFoundException: " + e);
 		} catch (MalformedTemplateNameException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Create Organization MalformedTemplateNameException: " + e);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Create Organization ParseException: " + e);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Create Organization IOException: " + e);
 		} catch (TemplateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Create Organization TemplateException: " + e);
+		} catch (Exception e) {
+			logger.error("Create Organization Exception: " + e);
 		}
+		
 		return resultStatus;
 	}
-	
-	private Map paseSeqResponse(Document response){
-		String[] entityNames = {"ORGANIZATION","CUSTOMER","ADDRESS","ADDRESSREFERENCE","INDIVIDUAL","CONTACT","AGENTASSIGNMENT" };
+
+	private Map paseSeqResponse(Document response) {
+		String[] entityNames = { "ORGANIZATION", "CUSTOMER", "ADDRESS", "ADDRESSREFERENCE", "INDIVIDUAL", "CONTACT",
+				"AGENTASSIGNMENT" };
 		String entityName = null;
 		Map values = null;
 		if (response != null) {
@@ -168,7 +167,7 @@ public class OrganizationServiceImpl implements OrganizationService{
 		}
 		return values;
 	}
-	
+
 	private String transformCustomerForm(String requestSOAP) {
 		StringWriter writer = new StringWriter();
 		StreamResult result = new StreamResult(writer);
@@ -178,8 +177,7 @@ public class OrganizationServiceImpl implements OrganizationService{
 			Document doc = DocumentHelper.parseText(requestSOAP);
 			Node node = doc.selectSingleNode("//Organization");
 			Source source = new StreamSource(Class.class.getResourceAsStream("/blis2boss_customer.xsl"));
-			Transformer transformer = TransformerFactory.newInstance()
-					.newTransformer(source);
+			Transformer transformer = TransformerFactory.newInstance().newTransformer(source);
 			reader = new StringReader(node.asXML());
 			Source xmlSource = new StreamSource(reader);
 			transformer.transform(xmlSource, result);
@@ -201,10 +199,10 @@ public class OrganizationServiceImpl implements OrganizationService{
 			e.printStackTrace();
 		} finally {
 			try {
-				if(writer != null){
+				if (writer != null) {
 					writer.close();
 				}
-				if(reader != null){
+				if (reader != null) {
 					reader.close();
 				}
 			} catch (IOException e) {

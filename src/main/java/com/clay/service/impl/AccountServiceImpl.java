@@ -45,6 +45,8 @@ public class AccountServiceImpl implements AccountService {
 	
 	@Autowired
 	private OrganizationMapper organizationMapper;
+	
+	private final String CODS_SUCCESS = "//*[name()='createOrganizationResponse']/*[name()='Success']";
 
 	@Override
 	public String createAccount(String accountName, String organizationName, AccountType accountType) {
@@ -82,12 +84,6 @@ public class AccountServiceImpl implements AccountService {
 		}
 
 		try {
-			// Get needed Seq ids
-			Document seqRequestDoc = new SAXReader()
-					.read(Class.class.getResourceAsStream("/templates/getAccountInfoSequence.xml"));
-			Document response = soapClient.sendSOAPMessage(seqRequestDoc.asXML());
-			Map responseValues = paseSeqResponse(response);
-			
 			// Get org info
 			Map<String, Integer> orgAndCustomerIdsMap = organizationMapper.selectOrgAndCustomerIdsByOrgName(organizationName);
 			String organizationId = String.valueOf(orgAndCustomerIdsMap.get("ORGANIZATIONUNITID"));
@@ -99,9 +95,15 @@ public class AccountServiceImpl implements AccountService {
 			if (CollectionUtils.isEmpty(individualIdList)) {
 				return resultStatus;
 			} else if (individualIdList.size() < 2) {
-				individualIdList.add(individualIdList.get(0));
+				individualIdList.add(individualIdList.get(0));//using the same individual info
 			}
 			
+			// Get needed Seq ids
+			Document seqRequestDoc = new SAXReader()
+					.read(Class.class.getResourceAsStream("/templates/getAccountInfoSequence.xml"));
+			Document response = soapClient.sendSOAPMessage(seqRequestDoc.asXML());
+			Map responseValues = paseSeqResponse(response);
+						
 			// Construct data
 			Map<String, String> dataMap = new HashMap<String, String>();
 			List addressIds = (List) responseValues.get("ADDRESS");
@@ -145,34 +147,33 @@ public class AccountServiceImpl implements AccountService {
 			
 			// Send request
 			Template template = freemarkerConfig.getTemplate("createAccount.ftl", "UTF-8");
-			String orgCreateReqXML = FreeMarkerTemplateUtils.processTemplateIntoString(template, dataMap);
-			logger.debug("requestXML: " + orgCreateReqXML);
-			Document responseOrgXML = soapClient.sendSOAPMessage(orgCreateReqXML);
+			String accountCreateReqXML = FreeMarkerTemplateUtils.processTemplateIntoString(template, dataMap);
+			logger.debug("requestXML: " + accountCreateReqXML);
+			Document responseAccountXML = soapClient.sendSOAPMessage(accountCreateReqXML);
 			
-			// TODO
-			
-			resultStatus = "Success";
+			// process response
+			if (responseAccountXML != null) {
+				Node orgIdNode = responseAccountXML.selectSingleNode(CODS_SUCCESS);
+				if (orgIdNode != null) {
+					resultStatus = "Success";
+				}
+			}
 		} catch (DocumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Create Account DocumentException: " + e);
 		} catch (SOAPClientException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Create Account SOAPClientException: " + e);
 		} catch (TemplateNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Create Account TemplateNotFoundException: " + e);
 		} catch (MalformedTemplateNameException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Create Account MalformedTemplateNameException: " + e);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Create Account ParseException: " + e);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Create Account IOException: " + e);
 		} catch (TemplateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Create Account TemplateException: " + e);
+		} catch (Exception e) {
+			logger.error("Create Account Exception: " + e);
 		}
 
 		return resultStatus;
