@@ -1,0 +1,93 @@
+<TrialRun>
+	<subscription blisChargeActivationType="new" offerCode="MC Named Hosts Pro USD">
+		<subscriptionContext>
+			<parameterSet>
+				<parameter name="Initial_Term" value="1" type="number" labelname="Initial Term" labelvalue="1"/>
+				<parameter name="Renewal_Term" value="0" type="number" labelname="Renewal Term" labelvalue="0"/>
+				<parameter name="Prepay_Term" value="1" type="number" labelname="Prepay Term" labelvalue="1(Regular)"/>
+				<parameter name="Free_Month" value="0" type="number" labelname="Number of Free Months" labelvalue="0"/>
+				<parameter name="Reporting_Code" value="Normal" type="string" labelname="Reporting Code" labelvalue="Normal"/>
+				<parameter name="OfferName" value="MC Named Hosts Pro 25 USD" type="string" labelname="Offer Name" labelvalue="MC Named Hosts Pro 25"/>
+			</parameterSet>
+		</subscriptionContext>
+		<chargeActivation blisChargeActivationType="new" activationCode="" parentCode="Branding Charge USD" blisChargeCode="Branding Charge USD">
+			<parameterSet>
+				<parameter name="Price" value="199" type="number" labelname="Branding Fee" labelvalue="199"/>
+				<parameter name="None" value="1" type="Number" labelname="Branding fee may be waived if customer orders 25 or more named hosts. This applies to Multi-Service Named Hosts also (sum of Multi-Service Named Hosts must be 25 or more). For Ports, Minutes Branding, consult the GOA Pages." labelvalue="1"/>
+			</parameterSet>
+		</chargeActivation>
+		<chargeActivation blisChargeActivationType="new" activationCode="" parentCode="Primary Language Charge USD" blisChargeCode="Primary Language Charge USD">
+			<parameterSet>
+				<parameter name="Primary Language" value="English" type="string" labelname="Primary Language" labelvalue="English"/>
+			</parameterSet>
+		</chargeActivation>
+		<subscription blisChargeActivationType="new" activationCode="" offerCode="Ports1 USD" offerConditionCode="Ports1 USD">
+			<subscriptionContext>
+				<parameterSet>
+					<parameter name="PortQty" value="1" type="number" labelname="Named Hosts" labelvalue="1"/>
+					<parameter name="PortUnitPrice" value="49.00" type="number" labelname="Unit Price " labelvalue="49.00"/>
+					<parameter name="ExtendedPortsPrice" value="0" type="number" labelname="Extended Price" labelvalue="0"/>
+					<parameter name="CompPortQty" value="0" type="number" labelname="Complimentary Named Hosts" labelvalue="0"/>
+					<parameter name="IsVoIP" value="0" type="number" labelname="Monthly Flat Fee Integrated VoIP with Proration" labelvalue="0"/>
+					<parameter name="VoIPUnitPrice" value="10.00" type="number" labelname="" labelvalue="10.00"/>
+				</parameterSet>
+			</subscriptionContext>
+			<chargeActivation blisChargeActivationType="new" activationCode="" parentCode="Ports Charge USD" blisChargeCode="Ports Charge USD">
+				<parameterSet/>
+			</chargeActivation>
+			<chargeActivation blisChargeActivationType="new" activationCode="" parentCode="Ports Prorata Charge USD" blisChargeCode="Ports Prorata Charge USD">
+				<parameterSet/>
+			</chargeActivation>
+		</subscription>
+		<subscription blisChargeActivationType="new" activationCode="" offerCode="Teleconference USD" offerConditionCode="Teleconference USD">
+			<subscriptionContext>
+				<parameterSet>
+					<parameter name="Tel_Initial_Term" value="1" type="number" labelname="Teleconference Initial Term for Free Month" labelvalue="1"/>
+				</parameterSet>
+			</subscriptionContext>
+		</subscription>
+		<chargeActivation blisChargeActivationType="new" activationCode="" parentCode="Meeting Assist Charge USD" blisChargeCode="Meeting Assist Charge USD">
+			<parameterSet>
+				<parameter name="Has12100" value="0" type="number" labelname="Meeting/Training Assist - Standard (Obsolete)" labelvalue="0"/>
+				<parameter name="Price12100" value="149.000" type="number" labelname="NULL" labelvalue="149.000"/>
+				<parameter name="Has12101" value="1" type="number" labelname="Meeting/Training Assist - Premium" labelvalue="1"/>
+				<parameter name="Price12101" value="500.000" type="number" labelname="NULL" labelvalue="500.000"/>
+				<parameter name="HasExtrHr" value="1" type="number" labelname="Additional Hours" labelvalue="1"/>
+				<parameter name="ExtrHrPrice" value="250.000" type="number" labelname="Additional Hour" labelvalue="250.000"/>
+				<parameter name="HasCopy2CD" value="0" type="number" labelname="Recording of Event on Compact Disk (Obsolete)" labelvalue="0"/>
+				<parameter name="Copy2CDPrice" value="100.000" type="number" labelname="Copy to CD" labelvalue="100.000"/>
+				<parameter name="CommitAssists" value="0" type="number" labelname="Mo Commitment (Obsolete)" labelvalue="0"/>
+				<parameter name="CommitPrice" value="0" type="number" labelname="Committed Price" labelvalue="0"/>
+				<parameter name="CommitType" value="Null" type="string" labelname="Mo Committed Type (Obsolete)" labelvalue="None"/>
+			</parameterSet>
+		</chargeActivation>
+		<chargeActivation blisChargeActivationType="new" activationCode="" parentCode="NBR Storage Charge USD" blisChargeCode="NBR Storage Charge USD">
+			<parameterSet>
+				<parameter name="IndFreeStg" value="1" type="number" labelname="Included Free Storage" labelvalue="1"/>
+				<parameter name="CmttMoStgQty" value="0" type="number" labelname="Committed Monthly Storage" labelvalue="0"/>
+				<parameter name="CmttMoStgUnitPrice" value="0.00" type="number" labelname="Committed Monthly Storage" labelvalue="0.00"/>
+				<parameter name="CmttMoStgPrice" value="0.00" type="Number" labelname="Committed Monthly Storage" labelvalue="0.00"/>
+				<parameter name="IsOverage" value="1" type="number" labelname="Enable Overage" labelvalue="1"/>
+				<parameter name="AdditionalStgUnitPrice" value="16.00" type="number" labelname="Enable Overage" labelvalue="16.00"/>
+			</parameterSet>
+		</chargeActivation>
+		<subscription blisChargeActivationType="new" activationCode="" offerCode="SSL USD" offerConditionCode="SSL USD">
+			<subscriptionContext>
+				<parameterSet/>
+			</subscriptionContext>
+			<chargeActivation blisChargeActivationType="new" activationCode="" parentCode="SSL Setup and Maintenance USD" blisChargeCode="SSL Setup and Maintenance USD">
+				<parameterSet>
+					<parameter name="SetupSSLUnitPrice" value="0" type="number" labelname="SSL Setup " labelvalue="0"/>
+					<parameter name="MainSSLUnitPrice" value="0" type="number" labelname="Maintenance Price" labelvalue="0"/>
+					<parameter name="BlockSize" value="100" type="number" labelname="Block Size" labelvalue="100"/>
+				</parameterSet>
+			</chargeActivation>
+		</subscription>
+		<chargeActivation blisChargeActivationType="new" activationCode="" parentCode="Partner Teleconference Charge USD" blisChargeCode="Partner Teleconference Charge USD">
+			<parameterSet/>
+		</chargeActivation>
+		<chargeActivation blisChargeActivationType="new" activationCode="" parentCode="Prepayment Charge USD" blisChargeCode="Prepayment Charge USD">
+			<parameterSet/>
+		</chargeActivation>
+	</subscription>
+</TrialRun>

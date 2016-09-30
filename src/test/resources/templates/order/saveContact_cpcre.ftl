@@ -1,0 +1,117 @@
+ <SOAP:Envelope xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/">
+	<SOAP:Body>
+		<doContactPersistent xmlns="http://www.webex.com/blis/1.0/SOA/main">
+			<entityId>24</entityId>
+			<entityKeyId>${orderServiceId}</entityKeyId>
+			<contacts>
+			</contacts>
+			<addresses>
+				<UpdateObject xmlns="http://www.webex.com/blis/cpcre">
+					<tuple>
+						<old>
+							<data>
+								<metadata>
+									<object_id>${implContactAddressId}</object_id>
+									<alias>AddressInfo</alias>
+									<lastmodifieddate ms="1441591706000"/>
+								</metadata>
+							</data>
+						</old>
+						<new>			
+							<data>
+								<metadata>
+									<alias>AddressInfo</alias>
+								</metadata>
+								<object>
+									<AddressInfo>
+										<BLIS_ADDRESS>
+											<ADDRESSID>${implContactAddressId}</ADDRESSID>
+											<ADDRESS1>2424 PIEDMONT RD NE</ADDRESS1>
+											<ADDRESS2/>
+											<COUNTRY>US</COUNTRY>
+											<CITY/>
+											<COUNTY/>
+											<STATE>GA</STATE>
+											<PROVINCE/>
+											<POSTALCODE/>
+											<PHONE/>
+											<FAX/>
+											<STATUS>Active</STATUS>
+											<CREATEDBY>231</CREATEDBY>
+											<LASTMODIFIEDBY>452</LASTMODIFIEDBY>
+											<LASTMODIFIEDDATE>sysdate</LASTMODIFIEDDATE>
+											<NOTES/>
+											<ENTITYID>9</ENTITYID>
+											<ENTITYKEYID>${implContactIndividualId}</ENTITYKEYID>
+										</BLIS_ADDRESS>
+									</AddressInfo>
+								</object>
+							</data>
+						</new>
+					</tuple>
+				</UpdateObject>
+			</addresses>
+			<individuals>
+				<UpdateObject xmlns="http://www.webex.com/blis/cpcre">
+					<tuple>
+						<old>
+							<data>
+								<metadata>
+									<object_id>${implContactIndividualId}</object_id>
+									<alias>Individuals</alias>
+									<lastmodifieddate ms="1473762298000"/>
+								</metadata>
+							</data>
+						</old>
+						<new>			
+							<data>
+								<metadata>
+									<alias>Individuals</alias>
+								</metadata>
+								<object>
+									<Individuals>
+										<BLIS_INDIVIDUAL>
+											<INDIVIDUALID>${implContactIndividualId}</INDIVIDUALID>
+											<INDIVIDUALTYPEID>1</INDIVIDUALTYPEID>
+											<USERID/>
+											<FIRSTNAME>Stan</FIRSTNAME>
+											<LASTNAME>Binning</LASTNAME>
+											<MIDDLENAME/>
+											<EMAIL>blank@blank.com</EMAIL>
+											<EMAIL2/>
+											<WORKPHONENUMBER>404-427-4369</WORKPHONENUMBER>
+											<HOMEPHONENUMBER/>
+											<CELLPHONENUMBER/>
+											<PAGERNUMBER/>
+											<FAXNUMBER/>
+											<ORGANIZATIONUNITID>${orgId}</ORGANIZATIONUNITID>
+											<GROUPID/>
+											<JOBTITLE/>
+											<DEPARTMENT>Business Development / Channel</DEPARTMENT>
+											<REPORTSTO/>
+											<MAINADDRESSID>${implContactAddressId}</MAINADDRESSID>
+											<URL/>
+											<LEADSOURCE/>
+											<ALLOWPROMOTION/>
+											<ALLOWREFERENCE/>
+											<ALLOWEMAIL>1</ALLOWEMAIL>
+											<MARKETINGPROJECT/>
+											<REFERREDBY/>
+											<STATUS>Active</STATUS>
+											<CREATEDBY>231</CREATEDBY>
+											<LASTMODIFIEDBY>452</LASTMODIFIEDBY>
+											<LASTMODIFIEDDATE>sysdate</LASTMODIFIEDDATE>
+											<JOBFUNCTION>Administrative Assistant</JOBFUNCTION>
+											<ENTITYID/>
+											<ENTITYKEYID/>
+										</BLIS_INDIVIDUAL>
+									</Individuals>
+								</object>
+							</data>
+						</new>
+					</tuple>
+				</UpdateObject>	
+			</individuals>	        
+		</doContactPersistent>
+	</SOAP:Body>
+</SOAP:Envelope>

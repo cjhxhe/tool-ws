@@ -80,6 +80,7 @@ public class SOAPClient {
 			out.close();
 			SAXReader xmlReader = new SAXReader();
 			response = xmlReader.read(urlconn.getInputStream());
+			response = replaceNameSpace(response.asXML());
 		} catch (MalformedURLException e) {
 			logger.error("URL is malformed");
 			throw new SOAPClientException("URL is malformed.", e);
@@ -145,4 +146,9 @@ public class SOAPClient {
 		return _sessionID;
 	}
 
+	public Document replaceNameSpace(String sResponseXML) throws DocumentException {
+		final String sResponseString = sResponseXML.replaceAll("xmlns=\"http://www.webex.com/blis/", "xmlTemp=\"");
+		final Document document = DocumentHelper.parseText(sResponseString);
+		return document;
+	}
 }

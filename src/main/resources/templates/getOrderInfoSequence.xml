@@ -1,0 +1,30 @@
+<SOAP:Envelope xmlns:SOAP="http://schemas.xmlsoap.org/soap/envelope/">
+	<SOAP:Body>
+		<getIDByEntityName xmlns="http://www.webex.com/blis/1.0/custom">
+			<tuple>
+				<Order/>
+			</tuple>
+			<tuple>
+				<orderservice/>
+			</tuple>
+			<tuple>
+				<contact/>
+			</tuple>
+			<tuple>
+				<PROVISIONSETTING/>
+			</tuple>
+			<tuple>
+				<PROVISIONTICKET/>
+			</tuple>
+			<tuple>
+				<SITE/>
+			</tuple>
+			<tuple>
+				<AGENTASSIGNMENT/>
+			</tuple>
+			<tuple>
+				<AGENTASSIGNMENT/>
+			</tuple>
+		</getIDByEntityName>
+	</SOAP:Body>
+</SOAP:Envelope>

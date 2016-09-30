@@ -46,7 +46,7 @@ public class AccountServiceImpl implements AccountService {
 	@Autowired
 	private OrganizationMapper organizationMapper;
 	
-	private final String CODS_SUCCESS = "//*[name()='createOrganizationResponse']/*[name()='Success']";
+	private final String CODS_SUCCESS = "//*[name()='createAccountResponse']/*[name()='Success']";
 
 	@Override
 	public String createAccount(String accountName, String organizationName, AccountType accountType) {
