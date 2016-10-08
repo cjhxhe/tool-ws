@@ -18,5 +18,8 @@ public interface AccountMapper {
 			+ " AND ASS.ENTITYID = 3 AND ASS.STATUS = 'Active' AND ASS.KEYID = ACCOUNT.ACCOUNTID AND AG.AGENTID = ASS.AGENTID")
 	@Options(useCache = true, flushCache = FlushCachePolicy.FALSE, timeout = 10000)
 	public List<Map<String, String>> getCMNameByPSRID(@Param("accountId") String accountId);
-
+	
+	@Select("SELECT COUNT(*) FROM BLIS_ACCOUNT WHERE STATUS = 'Pending-order' AND NAME = #{accountName}")
+	@Options(useCache = true, flushCache = FlushCachePolicy.FALSE, timeout = 10000)
+	public Integer checkPendingOrderAccount(@Param("accountName") String accountName);
 }

@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import com.clay.exception.SOAPClientException;
+import com.clay.exception.ServiceException;
 import com.clay.service.OrganizationService;
 import com.clay.soap.SOAPClient;
 
@@ -60,7 +61,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
 	@Override
 	public String createOrganization(String organizationName) {
-		String resultStatus = "Failed";
+		String result = "Failed";
 		SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD");
 		try {
 			// Get needed Seq ids
@@ -98,20 +99,27 @@ public class OrganizationServiceImpl implements OrganizationService {
 
 			// process response
 			if (responseOrgXML != null) {
+				logger.debug("responseOrgXML: " + responseOrgXML.asXML());
 				Node orgIdNode = responseOrgXML.selectSingleNode(CODS_SUCCESS);
 				if (orgIdNode != null) {
 					/* send soap to the boss */
 					String stringData = this.transformCustomerForm(orgCreateReqXML);
-					Document blisToBossSOPA = new SAXReader()
+					Document blisToBossSOAP = new SAXReader()
 							.read(Class.class.getResourceAsStream("/templates/blisToBossSoap.xml"));
-					Document blisToBossSOPATemp = (Document) blisToBossSOPA.clone();
-					Element dataEle = (Element) blisToBossSOPATemp.selectSingleNode(CODS_DATA);
+					Document blisToBossSOAPTemp = (Document) blisToBossSOAP.clone();
+					Element dataEle = (Element) blisToBossSOAPTemp.selectSingleNode(CODS_DATA);
 					Document stringDataDoc = DocumentHelper.parseText(stringData);
 					dataEle.add(stringDataDoc.getRootElement());
-					Document blisToBossResp = soapClient.sendSOAPMessage(blisToBossSOPATemp.asXML());
+					Document blisToBossResp = soapClient.sendSOAPMessage(blisToBossSOAPTemp.asXML());
 					if (blisToBossResp.selectSingleNode(CODS_INTER_SUCCESS) != null) {
-						resultStatus = "Success";
+						result = "Org created successfully.";
+					} else {
+						result = "Org created with integration task error.";
+						throw new ServiceException("Org created failed when send request to boss. blisToBossRespXML: \n" + blisToBossResp.asXML());
 					}
+				} else {
+					result = "Org created failed when send request to cordys.";
+					throw new ServiceException("Org created failed when send request to cordys. responseOrgXML: \n" + responseOrgXML.asXML());
 				}
 			}
 		} catch (DocumentException e) {
@@ -132,7 +140,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 			logger.error("Create Organization Exception: " + e);
 		}
 		
-		return resultStatus;
+		return result;
 	}
 
 	private Map paseSeqResponse(Document response) {

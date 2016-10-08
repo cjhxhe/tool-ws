@@ -20,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 import com.clay.dal.mapper.blis.OrganizationMapper;
 import com.clay.enums.AccountType;
 import com.clay.exception.SOAPClientException;
+import com.clay.exception.ServiceException;
 import com.clay.service.AccountService;
 import com.clay.soap.SOAPClient;
 import com.clay.util.StringUtil;
@@ -50,7 +51,7 @@ public class AccountServiceImpl implements AccountService {
 
 	@Override
 	public String createAccount(String accountName, String organizationName, AccountType accountType) {
-		String resultStatus = "Failed";
+		String result = "Failed";
 		String subType = "";
 		String relationship = "Partner VAR";
 		String supportBy = "WebEx";
@@ -89,11 +90,13 @@ public class AccountServiceImpl implements AccountService {
 			String organizationId = String.valueOf(orgAndCustomerIdsMap.get("ORGANIZATIONUNITID"));
 			String customerId = String.valueOf(orgAndCustomerIdsMap.get("CUSTOMERID"));
 			if (StringUtil.isEmpty(organizationId) || "null".equalsIgnoreCase(organizationId)) {
-				return resultStatus;
+				result = "Can not get the organization info by organizationName.";
+				throw new ServiceException(result);
 			}
 			List<Integer> individualIdList = organizationMapper.getIndividualIdsByOrgId(orgAndCustomerIdsMap.get("ORGANIZATIONUNITID"));
 			if (CollectionUtils.isEmpty(individualIdList)) {
-				return resultStatus;
+				result = "Can not get the individual info by organization.";
+				throw new ServiceException(result);
 			} else if (individualIdList.size() < 2) {
 				individualIdList.add(individualIdList.get(0));//using the same individual info
 			}
@@ -155,8 +158,14 @@ public class AccountServiceImpl implements AccountService {
 			if (responseAccountXML != null) {
 				Node orgIdNode = responseAccountXML.selectSingleNode(CODS_SUCCESS);
 				if (orgIdNode != null) {
-					resultStatus = "Success";
+					result = "Create Account Successfully.";
+				} else {
+					result = "Create Account failure.";
+					throw new ServiceException("Create Account failure with XML: \n" + responseAccountXML.asXML());
 				}
+			} else {
+				result = "Send account create request to cordys failure.";
+				throw new ServiceException(result);
 			}
 		} catch (DocumentException e) {
 			logger.error("Create Account DocumentException: " + e);
@@ -176,7 +185,7 @@ public class AccountServiceImpl implements AccountService {
 			logger.error("Create Account Exception: " + e);
 		}
 
-		return resultStatus;
+		return result;
 	}
 
 	private Map paseSeqResponse(Document response) {

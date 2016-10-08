@@ -24,6 +24,7 @@ import com.clay.dal.mapper.blis.ContactMapper;
 import com.clay.dal.mapper.blis.OrderMapper;
 import com.clay.dal.mapper.blis.OrganizationMapper;
 import com.clay.enums.OrderType;
+import com.clay.exception.ServiceException;
 import com.clay.service.OrderService;
 import com.clay.soap.SOAPClient;
 import com.clay.util.StringUtil;
@@ -68,10 +69,7 @@ public class OrderServiceImpl implements OrderService {
 		dataMap.put("offerCode", "MC Named Hosts Pro USD");
 		dataMap.put("webexUrl", "claytoolwssite-" + StringUtil.generateRandomString(10) + ".qa.webex.com");
 		try {
-			
-			//TODO validation
 			preValidation(dataMap);
-			
 			generateSeqId(dataMap);
 			setOrderContext(dataMap, orderType);
 			setOrderInfoByAccID(dataMap);
@@ -107,7 +105,11 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	private void preValidation(Map<String, String> dataMap) throws Exception {
-		// TODO
+		if (!OrderType.NEW.getName().equalsIgnoreCase(dataMap.get("orderType"))) {
+			throw new ServiceException("Only New Order is supported.");
+		} else if (StringUtil.isEmpty(dataMap.get("accountName")) || accountMapper.checkPendingOrderAccount(dataMap.get("accountName")) < 1) {
+			throw new ServiceException("Account is not under 'Pending-Order' status. Please check account.");
+		}
 	}
 	
 	private void generateSeqId(Map<String, String> dataMap) throws Exception {
@@ -179,6 +181,8 @@ public class OrderServiceImpl implements OrderService {
 			Element additional = (Element) rootXML.selectSingleNode(".//additionalInformation[@name='SERVICE_TYPE']");
 			if (null != additional) {
 				dataMap.put("serviceType", additional.attributeValue("value"));
+			} else {
+				throw new ServiceException("Could not get serviceType from OfferInstance request -- XML : \n" + rootXML.asXML());
 			}
 		}
 	}
@@ -194,6 +198,9 @@ public class OrderServiceImpl implements OrderService {
 		if (generateSubscriptionCodeRespXML != null) {
 			String subscriptionCode = StringUtil.getNodeTextAsStringByPattern(generateSubscriptionCodeRespXML,
 					".//SubscriptionCode");
+			if (StringUtil.isEmpty(subscriptionCode)) {
+				throw new ServiceException("Could not get subscriptionCode from getNewSubscriptionCode request -- XML : \n" + generateSubscriptionCodeRespXML);
+			}
 			dataMap.put("subscriptionCode", subscriptionCode);
 		}
 	}
